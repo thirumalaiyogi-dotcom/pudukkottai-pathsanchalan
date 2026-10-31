@@ -5,6 +5,14 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>பதசஞ்சலன் நிர்வாகம்</title>
+<link rel="manifest" href="/admin.webmanifest">
+<meta name="theme-color" content="#C8550F">
+<link rel="icon" type="image/png" href="/icons/admin-192.png">
+<link rel="apple-touch-icon" href="/icons/admin-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="பதசஞ்சலன்">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@600;800&family=Hind+Madurai:wght@400;500;600;700&display=swap">
 <style>
@@ -184,6 +192,12 @@ label.f{display:grid;gap:5px;font-weight:600;font-size:.86rem}
 .msg{font-size:.88rem;padding:10px 12px;border-radius:10px;background:var(--soft)}
 .msg.err{color:var(--warn)} .msg.ok{color:var(--ok)}
 .auth .btn{justify-content:center;padding:12px}
+.install{display:none;align-items:center;gap:6px;height:38px;border-radius:10px;border:0;background:linear-gradient(180deg,var(--bhagwa),var(--bhagwa-deep));color:var(--on-bhagwa);font:700 .82rem var(--body);padding:0 12px;cursor:pointer;flex:none}
+.install.show{display:inline-flex}
+.install svg{width:16px;height:16px}
+@media (max-width:420px){.install span{display:none}.install{width:38px;justify-content:center;padding:0}}
+.ioshint{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;display:flex;gap:10px;align-items:center;font-size:.86rem}
+.ioshint button{margin-left:auto;background:none;border:0;color:var(--muted);font-size:1.2rem;cursor:pointer}
 #loading{text-align:center;color:var(--muted);padding:60px 0}
 </style>
 </head>
@@ -191,6 +205,7 @@ label.f{display:grid;gap:5px;font-weight:600;font-size:.86rem}
 <header class="bar"><div class="wrap">
   <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3v18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M6 4c4 0 6 1.5 12 1.2L14.5 9 19 13c-6 .3-8-1.2-13-1.2" fill="#fff"/></svg></div>
   <div class="brand"><b>பதசஞ்சலன் 2026</b><span>புதுக்கோட்டை ஜில்லா · நிர்வாகம்</span></div>
+  <button class="install" id="installBtn" title="App-ஆக நிறுவு"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>App நிறுவு</span></button>
   <span class="live" id="live" hidden><i></i><span id="liveTxt">இணைக்கிறது…</span></span>
   <button class="icon-btn" id="logout" title="வெளியேறு" aria-label="வெளியேறு" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/></svg></button>
 </div></header>
@@ -265,6 +280,7 @@ label.f{display:grid;gap:5px;font-weight:600;font-size:.86rem}
 </div>
 
 <div id="loading">ஏற்றுகிறது…</div>
+<div class="ioshint" id="iosHint" hidden><span>App-ஆக வைக்க: Safari-ல <b>Share</b> → <b>Add to Home Screen</b></span><button id="iosClose" aria-label="மூடு">✕</button></div>
 </div></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -465,6 +481,15 @@ $("xlsx").onclick=()=>{
 };
 
 (async()=>{const {data}=await sb.auth.getSession();boot(data.session)})();
+
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/admin-sw.js").catch(()=>{}));
+let deferredPrompt=null;
+const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").classList.add("show")});
+$("installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice.catch(()=>{});deferredPrompt=null;$("installBtn").classList.remove("show")};
+addEventListener("appinstalled",()=>$("installBtn").classList.remove("show"));
+if(!standalone&&/iphone|ipad|ipod/i.test(navigator.userAgent)){let seen=false;try{seen=localStorage.getItem("psIosHint")==="1"}catch(_){}if(!seen)$("iosHint").hidden=false}
+$("iosClose").onclick=()=>{$("iosHint").hidden=true;try{localStorage.setItem("psIosHint","1")}catch(_){}};
 </script>
 </body>
 </html>
