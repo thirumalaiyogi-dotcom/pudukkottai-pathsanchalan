@@ -62,6 +62,8 @@ label.f{display:grid;gap:5px;font-weight:600;font-size:.92rem;min-width:0}
 .req{color:var(--bhagwa)}
 .opt{font-weight:400;font-size:.8rem;color:var(--muted)}
 input,select{width:100%;font:16px var(--body);color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:11px 12px;transition:border-color .15s}
+input[list]{padding-right:36px;text-overflow:ellipsis}
+input::placeholder{color:var(--muted);opacity:.8}
 input:focus,select:focus{outline:none;border-color:var(--bhagwa);box-shadow:0 0 0 3px var(--soft)}
 button:focus-visible{outline:2px solid var(--bhagwa);outline-offset:2px}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
@@ -111,7 +113,7 @@ legend{font-weight:600;font-size:.92rem;margin-bottom:8px;padding:0}
           <input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10 இலக்க எண்"></label>
       </div>
       <label class="f"><span class="lt">படிப்பு / தொழில் <span class="opt">(விருப்பம்)</span></span>
-        <input id="eduJob" list="eduJobList" placeholder="எ.கா. கல்லூரி மாணவர் / விவசாயம்"></label>
+        <input id="eduJob" list="eduJobList" placeholder="எ.கா. மாணவர் / விவசாயம்"></label>
       <datalist id="eduJobList"><option value="பள்ளி மாணவர்"><option value="கல்லூரி மாணவர்"><option value="விவசாயம்"><option value="சொந்த தொழில்"><option value="தனியார் பணி"><option value="அரசு பணி"><option value="கூலி வேலை"><option value="ஆசிரியர்"><option value="ஓய்வு பெற்றவர்"></datalist>
     </div>
 
