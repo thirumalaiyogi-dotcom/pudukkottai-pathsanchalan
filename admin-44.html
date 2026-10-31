@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>பதசஞ்சலன் நிர்வாகம்</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@600;800&family=Hind+Madurai:wght@400;500;600&display=swap">
+<style>
+/* Layout: compact bhagwa header, summary first (tiles, unit×age matrix), then breakdowns, then the record list */
+:root{
+  --bg:#F7F3EE; --surface:#FFFFFF; --ink:#2A1A14; --muted:#7A675D; --line:#E9DDD1;
+  --bhagwa:#E8701A; --bhagwa-deep:#B9480D; --on-bhagwa:#FFFFFF; --field:#FBF8F4;
+  --soft:#FDEEE1; --ok:#2E7D4F; --warn:#B45309; --heat:232,112,26;
+  --display:"Noto Serif Tamil","Hind Madurai",Georgia,serif;
+  --body:"Hind Madurai","Noto Sans Tamil",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17110E; --surface:#221915; --ink:#F4EAE2; --muted:#B8A69B; --line:#3A2C25;
+  --bhagwa:#F2862F; --bhagwa-deep:#F2A060; --on-bhagwa:#1A110C; --field:#1C1511;
+  --soft:#3A2416; --ok:#6FCF97; --warn:#F5B454; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17110E; --surface:#221915; --ink:#F4EAE2; --muted:#B8A69B; --line:#3A2C25;
+  --bhagwa:#F2862F; --bhagwa-deep:#F2A060; --on-bhagwa:#1A110C; --field:#1C1511;
+  --soft:#3A2416; --ok:#6FCF97; --warn:#F5B454; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#C8550F}
+.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:linear-gradient(180deg,#F08A2A,#D25A10);color:#fff;padding-top:env(safe-area-inset-top,0px)}
+header .wrap{padding-block:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ttl{flex:1;min-width:0}
+.ttl p{margin:0;font-size:.82rem;opacity:.9}
+.ttl h1{margin:0;font:800 1.2rem/1.25 var(--display)}
+.live{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 10px;font-size:.8rem;font-weight:600}
+.live i{width:8px;height:8px;border-radius:50%;background:#9ca3af}
+.live.on i{background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.7)}
+@media (prefers-reduced-motion:no-preference){.live.on i{animation:pulse 1.8s infinite}@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}}
+.hbtn{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font:600 .82rem var(--body);cursor:pointer}
+main .wrap{padding-block:18px 60px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+h2{font:600 1.02rem var(--display);margin:0 0 12px;color:var(--bhagwa-deep);display:flex;align-items:center;gap:8px}
+h2 small{margin-left:auto;font:400 .8rem var(--body);color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.tile b{display:block;font:800 1.8rem/1.1 var(--display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.tile span{font-size:.82rem;color:var(--muted)}
+.tile.hl{background:var(--bhagwa);border-color:var(--bhagwa)}
+.tile.hl b,.tile.hl span{color:var(--on-bhagwa)}
+.flash{animation:fl 1.2s ease-out}
+@keyframes fl{0%{background:var(--soft)}}
+.tblwrap{overflow-x:auto;margin:0 -4px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.88rem}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.78rem}
+td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:var(--surface)}
+tr.tot td{font-weight:700;border-bottom:0;border-top:2px solid var(--line)}
+td.c{border-radius:4px}
+td.n{font-weight:700}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:640px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(0,8.5rem) 1fr 2.4rem;align-items:center;gap:8px;font-size:.86rem}
+.bar .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .t{height:10px;background:var(--soft);border-radius:5px;overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--bhagwa);border-radius:5px;transition:width .4s}
+.bar.new .t i{background:var(--ok)}
+.bar .n{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.none{color:var(--muted);font-size:.86rem}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.tools input,.tools select{flex:1;min-width:140px}
+input,select{font:15px var(--body);color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--bhagwa);box-shadow:0 0 0 3px var(--soft)}
+button:focus-visible{outline:2px solid var(--bhagwa);outline-offset:2px}
+.btn{border:0;border-radius:10px;background:linear-gradient(180deg,var(--bhagwa),var(--bhagwa-deep));color:var(--on-bhagwa);font:700 1rem var(--display);padding:12px 16px;cursor:pointer}
+.btn:disabled{opacity:.5}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);font:600 .9rem var(--body)}
+.xl{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.xl p{margin:0;color:var(--muted);font-size:.86rem}
+.list{display:grid}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:11px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .nm{font-weight:600}
+.item .tm{font-size:.78rem;color:var(--muted);text-align:right}
+.item .meta{grid-column:1/-1;font-size:.84rem;color:var(--muted)}
+.tag{display:inline-block;font-size:.74rem;padding:1px 8px;border-radius:999px;background:var(--soft);color:var(--bhagwa-deep);margin:3px 4px 0 0}
+.tag.new{color:var(--ok)}
+.del{background:none;border:0;color:var(--muted);font:500 .78rem var(--body);cursor:pointer;padding:2px 0;text-decoration:underline}
+.del.sure{color:var(--warn);font-weight:700}
+.item.fresh{animation:fl 2s ease-out}
+.more{margin-top:10px;width:100%}
+.login{max-width:400px;margin:24px auto 0;display:grid;gap:12px}
+.login h2{margin-bottom:0}
+.msg{font-size:.9rem;padding:10px 12px;border-radius:10px;background:var(--soft)}
+.msg.err{color:var(--warn)} .msg.ok{color:var(--ok)}
+.link{background:none;border:0;color:var(--bhagwa-deep);font:600 .88rem var(--body);cursor:pointer;padding:0;text-decoration:underline;justify-self:start}
+label.f{display:grid;gap:5px;font-weight:600;font-size:.9rem}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="ttl"><p>ராஷ்ட்ரீய ஸ்வயம்சேவக சங்கம் · புதுக்கோட்டை ஜில்லா</p><h1>பதசஞ்சலன் 2026 · நிர்வாகம்</h1></div>
+  <span class="live" id="live" hidden><i></i><span id="liveTxt">இணைக்கிறது…</span></span>
+  <button class="hbtn" id="logout" hidden>வெளியேறு</button>
+</div></header>
+
+<main><div class="wrap">
+
+<section id="loginView" class="card login" hidden>
+  <h2>நிர்வாகி உள்நுழைவு</h2>
+  <label class="f">மின்னஞ்சல்<input id="email" type="email" autocomplete="username"></label>
+  <label class="f">கடவுச்சொல்<input id="pass" type="password" autocomplete="current-password"></label>
+  <div id="loginMsg" class="msg" hidden></div>
+  <button class="btn" id="loginBtn">உள்நுழை</button>
+  <button class="link" id="signupBtn" type="button">முதல் முறையா? இதே விவரத்தில் கணக்கு உருவாக்கு</button>
+</section>
+
+<section id="denied" class="card" hidden>
+  <h2>அனுமதி இல்லை</h2>
+  <p class="none" id="deniedTxt"></p>
+</section>
+
+<div id="dash" hidden style="display:grid;gap:16px">
+  <div class="tiles">
+    <div class="tile hl"><b id="kTotal">0</b><span>மொத்த பதிவு</span></div>
+    <div class="tile"><b id="kToday">0</b><span>இன்று</span></div>
+    <div class="tile"><b id="kNew">0</b><span>புதியவர்கள்</span></div>
+    <div class="tile"><b id="kAge">–</b><span>சராசரி வயது</span></div>
+  </div>
+
+  <section class="card">
+    <h2>கண்ட / நகர் × வயது <small>எண்ணை தொட்டால் கீழே பட்டியல் வடிகட்டும்</small></h2>
+    <div class="tblwrap"><table id="matrix"></table></div>
+  </section>
+
+  <div class="grid2">
+    <section class="card"><h2>அமைப்பு வாரியாக</h2><div class="bars" id="byOrg"></div></section>
+    <section class="card"><h2>சங்க முகாம் வாரியாக</h2><div class="bars" id="byCamp"></div></section>
+  </div>
+
+  <section class="card xl">
+    <div><h2 style="margin:0 0 2px">Excel பதிவிறக்கம்</h2><p>எல்லா பதிவுகள் + கண்ட வாரியான சுருக்கம் + ஒவ்வொரு கண்டத்துக்கும் தனி sheet</p></div>
+    <button class="btn" id="xlsx">Excel (.xlsx) பதிவிறக்கு</button>
+  </section>
+
+  <section class="card">
+    <h2>பதிவானவர்கள் <small id="shownCount"></small></h2>
+    <div class="tools">
+      <input id="q" placeholder="பெயர் / ஊர் / எண் தேடு">
+      <select id="fUnit"><option value="">எல்லா கண்ட / நகர்</option></select>
+      <select id="fAge"><option value="">எல்லா வயதும்</option></select>
+    </div>
+    <div class="list" id="list"></div>
+    <button class="btn ghost more" id="more" hidden>மேலும் காட்டு</button>
+  </section>
+</div>
+
+<div id="loading" class="card none" style="text-align:center">ஏற்றுகிறது…</div>
+</div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SB_URL="https://efvcsxgzxkfcqjhgvniz.supabase.co", SB_KEY="sb_publishable_pER5Dv8ToteXfq-Vxt-l_A_I0GIvFDF";
+const UNITS=["புதுக்கோட்டை நகர்","புதுக்கோட்டை கண்ட","திருமயம்","பொன்னமராவதி","அன்னவாசல்","விராலிமலை","குளத்தூர்","கந்தர்வகோட்டை"];
+const AGES=[["18-க்கு கீழ்",0,17],["18–25",18,25],["26–35",26,35],["36–50",36,50],["51+",51,200]];
+const CAMPS=["ப்ராரம்பிக்","ப்ராத்தமிக்","சங்க சிக்ஷா வர்க","கார்யகர்த்தா விகாஸ் வர்க 1","கார்யகர்த்தா விகாஸ் வர்க 2"];
+const $=id=>document.getElementById(id);
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+let rows=[], channel=null, limitShown=50, freshIds=new Set();
+
+const ageGroup=a=>AGES.findIndex(g=>a>=g[1]&&a<=g[2]);
+UNITS.forEach(u=>$("fUnit").add(new Option(u,u)));
+AGES.forEach((g,i)=>$("fAge").add(new Option(g[0],String(i))));
+
+function view(v){
+  $("loading").hidden=true;
+  $("loginView").hidden=v!=="login";$("denied").hidden=v!=="denied";$("dash").hidden=v!=="dash";
+  $("logout").hidden=v==="login";$("live").hidden=v!=="dash";
+}
+function lmsg(t,k){const m=$("loginMsg");m.textContent=t;m.className="msg "+k;m.hidden=false}
+
+$("loginBtn").onclick=async()=>{
+  const email=$("email").value.trim(),password=$("pass").value;
+  if(!email||!password)return lmsg("மின்னஞ்சல், கடவுச்சொல் இரண்டும் தேவை.","err");
+  $("loginBtn").disabled=true;
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  $("loginBtn").disabled=false;
+  if(error)lmsg(/confirm/i.test(error.message)?"மின்னஞ்சலில் வந்த உறுதிப்படுத்தும் link-ஐ முதலில் அழுத்தவும்.":"மின்னஞ்சல் அல்லது கடவுச்சொல் தவறு.","err");
+};
+$("signupBtn").onclick=async()=>{
+  const email=$("email").value.trim(),password=$("pass").value;
+  if(!email||password.length<6)return lmsg("மின்னஞ்சலும் குறைந்தது 6 எழுத்து கடவுச்சொல்லும் கொடுக்கவும்.","err");
+  const {data,error}=await sb.auth.signUp({email,password});
+  if(error)return lmsg("கணக்கு உருவாக்க முடியவில்லை: "+error.message,"err");
+  if(!data.session)lmsg("உங்கள் மின்னஞ்சலுக்கு உறுதிப்படுத்தும் link அனுப்பப்பட்டது. அதை அழுத்திய பின் இங்கே உள்நுழையவும்.","ok");
+};
+$("logout").onclick=async()=>{await sb.auth.signOut()};
+
+sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>boot(session),0)});
+let booted=null;
+async function boot(session){
+  const key=session?session.user.id:"none";
+  if(booted===key)return;booted=key;
+  if(channel){sb.removeChannel(channel);channel=null}
+  if(!session){rows=[];return view("login")}
+  const {data:isAdmin}=await sb.rpc("ps_is_admin");
+  if(!isAdmin){$("deniedTxt").textContent=`${session.user.email} — இந்த கணக்குக்கு நிர்வாக அனுமதி இல்லை. முதன்மை நிர்வாகியிடம் கேட்கவும்.`;return view("denied")}
+  view("dash");await loadAll();subscribe();
+}
+
+async function loadAll(){
+  const all=[];let from=0;
+  while(true){
+    const {data,error}=await sb.from("ps_regs").select("*").order("created_at",{ascending:false}).range(from,from+999);
+    if(error){$("list").innerHTML=`<div class="none">பதிவுகளை ஏற்ற முடியவில்லை: ${esc(error.message)}</div>`;return}
+    all.push(...data);if(data.length<1000)break;from+=1000;
+  }
+  rows=all;render();
+}
+function subscribe(){
+  setLive(false,"இணைக்கிறது…");
+  channel=sb.channel("ps_regs_live")
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"ps_regs"},p=>{
+      if(!rows.some(r=>r.id===p.new.id)){rows.unshift(p.new);freshIds.add(p.new.id);render(true)}
+    })
+    .on("postgres_changes",{event:"DELETE",schema:"public",table:"ps_regs"},p=>{
+      rows=rows.filter(r=>r.id!==p.old.id);render();
+    })
+    .subscribe(s=>{
+      if(s==="SUBSCRIBED")setLive(true,"நேரலை");
+      else if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED")setLive(false,"இணைப்பு இல்லை");
+    });
+}
+function setLive(on,t){$("live").classList.toggle("on",on);$("liveTxt").textContent=t}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("dash").hidden)loadAll()});
+
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const isToday=d=>new Date(d).toDateString()===new Date().toDateString();
+const fmtT=d=>new Date(d).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+
+function counts(){
+  const m={};UNITS.forEach(u=>m[u]=AGES.map(()=>0));
+  const org={},camp={};let newc=0,ageSum=0,today=0;
+  rows.forEach(r=>{
+    if(!m[r.unit])m[r.unit]=AGES.map(()=>0);
+    const g=ageGroup(r.age);if(g>=0)m[r.unit][g]++;
+    ageSum+=r.age;if(r.is_new)newc++;if(isToday(r.created_at))today++;
+    const o=r.is_new?"புதியவர்":(r.org||"குறிப்பிடவில்லை");org[o]=(org[o]||0)+1;
+    if(!r.is_new){const c=r.camp||"முகாம் இல்லை";camp[c]=(camp[c]||0)+1}
+  });
+  return {m,org,camp,newc,today,avg:rows.length?(ageSum/rows.length).toFixed(1):"–"};
+}
+function setNum(id,v,flash){const el=$(id);if(el.textContent!==String(v)){el.textContent=v;if(flash){el.parentElement.classList.remove("flash");void el.offsetWidth;el.parentElement.classList.add("flash")}}}
+function bars(el,map,order){
+  let ent=Object.entries(map);
+  if(order)ent.sort((a,b)=>{const ia=order.indexOf(a[0]),ib=order.indexOf(b[0]);return (ia<0?99:ia)-(ib<0?99:ib)});
+  else ent.sort((a,b)=>b[1]-a[1]);
+  if(!ent.length){el.innerHTML='<div class="none">இன்னும் பதிவு இல்லை</div>';return}
+  const max=Math.max(...ent.map(e=>e[1]));
+  el.innerHTML=ent.map(([k,n])=>`<div class="bar${k==="புதியவர்"?" new":""}"><span class="l" title="${esc(k)}">${esc(k)}</span><span class="t"><i style="width:${(n/max*100).toFixed(1)}%"></i></span><span class="n">${n}</span></div>`).join("");
+}
+function matrix(m){
+  let max=1;Object.values(m).forEach(a=>a.forEach(n=>max=Math.max(max,n)));
+  const colT=AGES.map(()=>0);let html=`<thead><tr><th>கண்ட / நகர்</th>${AGES.map(g=>`<th>${g[0]}</th>`).join("")}<th>மொத்தம்</th></tr></thead><tbody>`;
+  Object.keys(m).forEach(u=>{
+    const a=m[u],t=a.reduce((x,y)=>x+y,0);a.forEach((n,i)=>colT[i]+=n);
+    html+=`<tr><td>${esc(u)}</td>${a.map((n,i)=>`<td class="c" data-u="${esc(u)}" data-a="${i}" style="${n?`background:rgba(var(--heat),${(.12+.55*n/max).toFixed(2)});cursor:pointer`:"color:var(--muted)"}">${n||"·"}</td>`).join("")}<td class="n">${t}</td></tr>`;
+  });
+  html+=`<tr class="tot"><td>மொத்தம்</td>${colT.map(n=>`<td>${n}</td>`).join("")}<td>${rows.length}</td></tr></tbody>`;
+  $("matrix").innerHTML=html;
+}
+$("matrix").addEventListener("click",e=>{
+  const td=e.target.closest("td.c");if(!td||td.textContent==="·")return;
+  $("fUnit").value=td.dataset.u;$("fAge").value=td.dataset.a;limitShown=50;renderList();
+  $("list").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+function render(flash){
+  const c=counts();
+  setNum("kTotal",rows.length,flash);setNum("kToday",c.today,flash);setNum("kNew",c.newc,flash);setNum("kAge",c.avg);
+  matrix(c.m);bars($("byOrg"),c.org);bars($("byCamp"),c.camp,[...CAMPS,"முகாம் இல்லை"]);
+  renderList();
+}
+function filtered(){
+  const q=$("q").value.trim().toLowerCase(),fu=$("fUnit").value,fa=$("fAge").value;
+  return rows.filter(r=>(!fu||r.unit===fu)&&(fa===""||ageGroup(r.age)===+fa)&&(!q||[r.name,r.ooru,r.phone].join(" ").toLowerCase().includes(q)));
+}
+function renderList(){
+  const f=filtered(),shown=f.slice(0,limitShown);
+  $("shownCount").textContent=`${f.length} பேர்`;
+  $("more").hidden=f.length<=limitShown;
+  if(!f.length){$("list").innerHTML=`<div class="none" style="padding:16px 0;text-align:center">${rows.length?"பொருந்தும் பதிவு இல்லை":"இன்னும் யாரும் பதிவு செய்யவில்லை. படிவத்தில் பதிவுகள் வந்ததும் இங்கே உடனே தெரியும்."}</div>`;return}
+  $("list").innerHTML=shown.map(r=>`<div class="item${freshIds.has(r.id)?" fresh":""}">
+    <span class="nm">${esc(r.name)}, ${r.age}</span><span class="tm">${fmtT(r.created_at)}</span>
+    <div class="meta">${esc(r.ooru)} · ${esc(r.unit)} · ${esc(r.phone)}${r.edu_job?" · "+esc(r.edu_job):""}<br>
+      ${r.is_new?'<span class="tag new">புதியவர்</span>':""}${r.org?`<span class="tag">${esc(r.org)}</span>`:""}${r.camp?`<span class="tag">${esc(r.camp)}</span>`:""}
+      <button class="del" data-id="${r.id}">நீக்கு</button></div></div>`).join("");
+  freshIds.clear();
+}
+["q","fUnit","fAge"].forEach(id=>$(id).addEventListener(id==="q"?"input":"change",()=>{limitShown=50;renderList()}));
+$("more").onclick=()=>{limitShown+=100;renderList()};
+$("list").addEventListener("click",async e=>{
+  const b=e.target.closest(".del");if(!b)return;
+  if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent="உறுதியா? மீண்டும் அழுத்தவும்";setTimeout(()=>{if(b.isConnected){b.classList.remove("sure");b.textContent="நீக்கு"}},4000);return}
+  b.disabled=true;const {error}=await sb.from("ps_regs").delete().eq("id",b.dataset.id);
+  if(error){b.disabled=false;b.textContent="நீக்க முடியவில்லை"}else{rows=rows.filter(r=>r.id!==b.dataset.id);render()}
+});
+
+$("xlsx").onclick=()=>{
+  if(!window.XLSX){alertMsg();return}
+  const sorted=[...rows].sort((a,b)=>UNITS.indexOf(a.unit)-UNITS.indexOf(b.unit)||new Date(a.created_at)-new Date(b.created_at));
+  const toRow=(r,i)=>({"வ.எண்":i+1,"பெயர்":r.name,"வயது":r.age,"வயது பிரிவு":AGES[ageGroup(r.age)]?.[0]||"","படிப்பு / தொழில்":r.edu_job||"","ஊர்":r.ooru,"கைபேசி":r.phone,"கண்ட / நகர்":r.unit,"சங்க முகாம்":r.camp||"","அமைப்பு":r.is_new?"புதியவர்":(r.org||""),"பதிவு நேரம்":new Date(r.created_at).toLocaleString("en-IN")});
+  const wb=XLSX.utils.book_new();
+  const cols=[{wch:6},{wch:24},{wch:6},{wch:11},{wch:22},{wch:18},{wch:12},{wch:20},{wch:24},{wch:22},{wch:20}];
+  const all=XLSX.utils.json_to_sheet(sorted.map(toRow));all["!cols"]=cols;
+  XLSX.utils.book_append_sheet(wb,all,"எல்லா பதிவுகள்");
+  const c=counts();
+  const sum=[["கண்ட / நகர்",...AGES.map(g=>g[0]),"மொத்தம்","புதியவர்கள்"]];
+  Object.keys(c.m).forEach(u=>{const a=c.m[u];sum.push([u,...a,a.reduce((x,y)=>x+y,0),rows.filter(r=>r.unit===u&&r.is_new).length])});
+  sum.push(["மொத்தம்",...AGES.map((g,i)=>Object.values(c.m).reduce((s,a)=>s+a[i],0)),rows.length,c.newc]);
+  const ws=XLSX.utils.aoa_to_sheet(sum);ws["!cols"]=[{wch:20},...AGES.map(()=>({wch:11})),{wch:9},{wch:11}];
+  XLSX.utils.book_append_sheet(wb,ws,"கண்ட சுருக்கம்");
+  UNITS.forEach(u=>{const rs=sorted.filter(r=>r.unit===u);if(!rs.length)return;
+    const s=XLSX.utils.json_to_sheet(rs.map(toRow));s["!cols"]=cols;XLSX.utils.book_append_sheet(wb,s,u.slice(0,31))});
+  const d=new Date(),stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  XLSX.writeFile(wb,`pathsanchalan-pudukkottai-${stamp}.xlsx`);
+};
+function alertMsg(){$("xlsx").textContent="Excel கருவி ஏற்றப்படவில்லை — இணையத்தை சரிபார்க்கவும்"}
+
+(async()=>{const {data}=await sb.auth.getSession();boot(data.session)})();
+</script>
+</body>
+</html>
