@@ -1,164 +1,262 @@
 <!doctype html>
 <html lang="ta">
 <head>
-<meta name="robots" content="noindex">
 <meta charset="utf-8">
+<meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>பதசஞ்சலன் நிர்வாகம்</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@600;800&family=Hind+Madurai:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@600;800&family=Hind+Madurai:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: compact bhagwa header, summary first (tiles, unit×age matrix), then breakdowns, then the record list */
+/* Layout: sticky bar → saffron summary band with 7-day trend → kanda cards → age mix → org/camp → detail table → records */
 :root{
-  --bg:#F7F3EE; --surface:#FFFFFF; --ink:#2A1A14; --muted:#7A675D; --line:#E9DDD1;
-  --bhagwa:#E8701A; --bhagwa-deep:#B9480D; --on-bhagwa:#FFFFFF; --field:#FBF8F4;
-  --soft:#FDEEE1; --ok:#2E7D4F; --warn:#B45309; --heat:232,112,26;
+  --bg:#F6F2EC; --surface:#FFFFFF; --sunk:#FAF6F1; --ink:#24160F; --muted:#7A675D; --faint:#A8968B; --line:#ECE2D7;
+  --bhagwa:#E8701A; --bhagwa-deep:#B4460C; --on-bhagwa:#FFFFFF; --soft:#FDEEE1;
+  --ok:#2E7D4F; --ok-soft:#E3F2E8; --warn:#B45309;
+  --a0:#FBD3AE; --a1:#F6A55E; --a2:#E8701A; --a3:#B4460C; --a4:#6E2A08;
+  --shadow:0 1px 2px rgba(80,40,10,.05),0 8px 24px -16px rgba(80,40,10,.35);
   --display:"Noto Serif Tamil","Hind Madurai",Georgia,serif;
   --body:"Hind Madurai","Noto Sans Tamil",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#17110E; --surface:#221915; --ink:#F4EAE2; --muted:#B8A69B; --line:#3A2C25;
-  --bhagwa:#F2862F; --bhagwa-deep:#F2A060; --on-bhagwa:#1A110C; --field:#1C1511;
-  --soft:#3A2416; --ok:#6FCF97; --warn:#F5B454; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#17110E; --surface:#221915; --ink:#F4EAE2; --muted:#B8A69B; --line:#3A2C25;
-  --bhagwa:#F2862F; --bhagwa-deep:#F2A060; --on-bhagwa:#1A110C; --field:#1C1511;
-  --soft:#3A2416; --ok:#6FCF97; --warn:#F5B454; color-scheme:dark}
+  --bg:#140F0C; --surface:#1F1814; --sunk:#191310; --ink:#F4EAE2; --muted:#B8A69B; --faint:#8A7A70; --line:#33281F;
+  --bhagwa:#F2862F; --bhagwa-deep:#F5A262; --on-bhagwa:#1A110C; --soft:#3A2416;
+  --ok:#6FCF97; --ok-soft:#173224; --warn:#F5B454;
+  --a0:#5A3A22; --a1:#8C4E1E; --a2:#C9631B; --a3:#F08A3A; --a4:#FFC58F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -16px rgba(0,0,0,.8); color-scheme:dark}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);margin:0}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#C8550F}
-.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header{background:linear-gradient(180deg,#F08A2A,#D25A10);color:#fff;padding-top:env(safe-area-inset-top,0px)}
-header .wrap{padding-block:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.ttl{flex:1;min-width:0}
-.ttl p{margin:0;font-size:.82rem;opacity:.9}
-.ttl h1{margin:0;font:800 1.2rem/1.25 var(--display)}
-.live{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 10px;font-size:.8rem;font-weight:600}
-.live i{width:8px;height:8px;border-radius:50%;background:#9ca3af}
-.live.on i{background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.7)}
-@media (prefers-reduced-motion:no-preference){.live.on i{animation:pulse 1.8s infinite}@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}}
-.hbtn{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font:600 .82rem var(--body);cursor:pointer}
-main .wrap{padding-block:18px 60px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
-h2{font:600 1.02rem var(--display);margin:0 0 12px;color:var(--bhagwa-deep);display:flex;align-items:center;gap:8px}
-h2 small{margin-left:auto;font:400 .8rem var(--body);color:var(--muted)}
-.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-@media (max-width:560px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.tile b{display:block;font:800 1.8rem/1.1 var(--display);font-variant-numeric:tabular-nums;color:var(--ink)}
-.tile span{font-size:.82rem;color:var(--muted)}
-.tile.hl{background:var(--bhagwa);border-color:var(--bhagwa)}
-.tile.hl b,.tile.hl span{color:var(--on-bhagwa)}
-.flash{animation:fl 1.2s ease-out}
-@keyframes fl{0%{background:var(--soft)}}
-.tblwrap{overflow-x:auto;margin:0 -4px}
-table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.88rem}
-th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-weight:600;color:var(--muted);font-size:.78rem}
-td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:var(--surface)}
-tr.tot td{font-weight:700;border-bottom:0;border-top:2px solid var(--line)}
-td.c{border-radius:4px}
-td.n{font-weight:700}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--bhagwa);outline-offset:2px}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.mark{width:38px;height:38px;border-radius:10px;flex:none;background:linear-gradient(160deg,#F49A43,#C8550F);display:grid;place-items:center;box-shadow:0 4px 10px -4px rgba(200,85,15,.6)}
+.mark svg{width:20px;height:20px}
+.brand{flex:1;min-width:0;line-height:1.25}
+.brand b{display:block;font:800 1.02rem var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{font-size:.78rem;color:var(--muted)}
+.live{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:600;color:var(--muted);background:var(--surface);white-space:nowrap}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.live.on{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,var(--line))}
+.live.on i{background:#22c55e}
+@media (prefers-reduced-motion:no-preference){.live.on i{animation:pulse 1.8s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn svg{width:18px;height:18px}
+@media (max-width:420px){.live span{display:none}.live{padding:8px}}
+
+main .wrap{padding-block:18px 64px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+#dash{display:grid;gap:18px;min-width:0}
+
+/* summary band */
+.band{border-radius:18px;padding:20px;color:#fff;background:radial-gradient(120% 140% at 100% 0%,#F7A24F 0%,#E8701A 45%,#B4460C 100%);box-shadow:0 18px 40px -24px rgba(180,70,12,.8);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;position:relative;overflow:hidden}
+.band::after{content:"";position:absolute;right:-60px;bottom:-80px;width:260px;height:260px;border-radius:50%;border:40px solid rgba(255,255,255,.07)}
+@media (max-width:640px){.band{grid-template-columns:minmax(0,1fr)}}
+.kicker{font-size:.78rem;letter-spacing:.06em;opacity:.9;margin:0}
+.big{font:800 3.4rem/1 var(--display);font-variant-numeric:tabular-nums;margin:6px 0 4px}
+.delta{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600}
+.minis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.mini{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:9px 11px}
+.mini b{display:block;font:800 1.35rem/1.1 var(--display);font-variant-numeric:tabular-nums}
+.mini span{font-size:.74rem;opacity:.9}
+.trend{position:relative;z-index:1;display:flex;flex-direction:column;min-width:0}
+.trend h3{margin:0 0 8px;font:600 .86rem var(--body);opacity:.95}
+.trend svg{width:100%;height:150px;display:block}
+.trend text{fill:rgba(255,255,255,.85);font:500 10px var(--body)}
+.flash{animation:fl 1.1s ease-out}
+@keyframes fl{0%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+/* sections */
+.sec-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 2px 10px}
+.sec-h h2{margin:0;font:800 1.1rem var(--display)}
+.sec-h small{color:var(--muted);font-size:.82rem}
+.sec-h .sp{flex:1}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.card h3{margin:0 0 12px;font:700 .98rem var(--display)}
+
+/* kanda cards */
+.units{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.units{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.unit{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 13px 12px;box-shadow:var(--shadow);text-align:left;cursor:pointer;color:inherit;display:grid;gap:8px;min-width:0;transition:border-color .15s,transform .15s}
+.unit:hover{border-color:color-mix(in srgb,var(--bhagwa) 45%,var(--line))}
+.unit.sel{border-color:var(--bhagwa);box-shadow:0 0 0 3px var(--soft)}
+.unit .nm{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.unit .tp{font-size:.7rem;color:var(--muted);letter-spacing:.04em}
+.unit .row{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.unit .ct{font:800 1.7rem/1 var(--display);font-variant-numeric:tabular-nums}
+.unit .pc{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.stack{display:flex;height:8px;border-radius:5px;overflow:hidden;background:var(--sunk)}
+.stack i{display:block;height:100%}
+.unit .nw{font-size:.74rem;color:var(--ok);font-weight:600}
+.unit .nw.z{color:var(--faint);font-weight:500}
+
+/* age */
+.ages{display:grid;gap:14px}
+.agebar{display:flex;height:26px;border-radius:8px;overflow:hidden;background:var(--sunk)}
+.agebar i{display:grid;place-items:center;height:100%;font-style:normal;font-size:.72rem;font-weight:700;color:#fff;min-width:0;overflow:hidden;transition:flex-grow .4s}
+.legend{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.lg{display:grid;gap:2px;padding:8px 10px;border-radius:10px;background:var(--sunk)}
+.lg span{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted)}
+.lg span::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--c)}
+.lg b{font:800 1.15rem var(--display);font-variant-numeric:tabular-nums}
+
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-@media (max-width:640px){.grid2{grid-template-columns:minmax(0,1fr)}}
-.bars{display:grid;gap:7px}
-.bar{display:grid;grid-template-columns:minmax(0,8.5rem) 1fr 2.4rem;align-items:center;gap:8px;font-size:.86rem}
-.bar .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar .t{height:10px;background:var(--soft);border-radius:5px;overflow:hidden}
-.bar .t i{display:block;height:100%;background:var(--bhagwa);border-radius:5px;transition:width .4s}
-.bar.new .t i{background:var(--ok)}
-.bar .n{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+@media (max-width:700px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.bars{display:grid;gap:9px}
+.hb{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;font-size:.86rem}
+.hb .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .n{font-weight:700;font-variant-numeric:tabular-nums}
+.hb .t{grid-column:1/-1;height:7px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.hb .t i{display:block;height:100%;background:var(--bhagwa);border-radius:4px;transition:width .4s}
+.hb.new .t i{background:var(--ok)}
 .none{color:var(--muted);font-size:.86rem}
-.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-.tools input,.tools select{flex:1;min-width:140px}
-input,select{font:15px var(--body);color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+
+details.card{padding:0}
+details summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:8px;font:700 .98rem var(--display)}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"";margin-left:auto;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+details[open] summary::after{transform:rotate(-135deg)}
+.tblwrap{overflow-x:auto;padding:0 16px 16px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.86rem}
+th,td{padding:9px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.76rem}
+td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:var(--surface)}
+tr.tot td{font-weight:800;border-bottom:0;border-top:2px solid var(--line)}
+td.c{border-radius:6px}
+td.n{font-weight:800}
+
+/* records */
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.search{flex:2;min-width:180px;position:relative}
+.search svg{position:absolute;left:11px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--faint)}
+.search input{padding-left:34px}
+.tools select{flex:1;min-width:130px}
+input,select{font:15px var(--body);color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
 input:focus,select:focus{outline:none;border-color:var(--bhagwa);box-shadow:0 0 0 3px var(--soft)}
-button:focus-visible{outline:2px solid var(--bhagwa);outline-offset:2px}
-.btn{border:0;border-radius:10px;background:linear-gradient(180deg,var(--bhagwa),var(--bhagwa-deep));color:var(--on-bhagwa);font:700 1rem var(--display);padding:12px 16px;cursor:pointer}
-.btn:disabled{opacity:.5}
-.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink);font:600 .9rem var(--body)}
-.xl{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.xl p{margin:0;color:var(--muted);font-size:.86rem}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 10px}
+.fchip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--bhagwa-deep);border:0;border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:600;cursor:pointer}
 .list{display:grid}
-.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:11px 0;border-top:1px solid var(--line)}
-.item:first-child{border-top:0}
-.item .nm{font-weight:600}
-.item .tm{font-size:.78rem;color:var(--muted);text-align:right}
-.item .meta{grid-column:1/-1;font-size:.84rem;color:var(--muted)}
-.tag{display:inline-block;font-size:.74rem;padding:1px 8px;border-radius:999px;background:var(--soft);color:var(--bhagwa-deep);margin:3px 4px 0 0}
-.tag.new{color:var(--ok)}
-.del{background:none;border:0;color:var(--muted);font:500 .78rem var(--body);cursor:pointer;padding:2px 0;text-decoration:underline}
+.rec{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding:12px 2px;border-top:1px solid var(--line)}
+.rec:first-child{border-top:0}
+.av{grid-row:span 2;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:800 .95rem var(--display);background:var(--soft);color:var(--bhagwa-deep)}
+.av.nw{background:var(--ok-soft);color:var(--ok)}
+.rec .nm{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec .nm small{font-weight:500;color:var(--muted)}
+.rec .tm{font-size:.74rem;color:var(--faint);text-align:right;white-space:nowrap}
+.rec .meta{grid-column:2/-1;font-size:.83rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.rec .meta a{color:inherit;text-decoration:none;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:.72rem;padding:1px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);color:var(--ink)}
+.tag.u{background:var(--soft);border-color:transparent;color:var(--bhagwa-deep);font-weight:600}
+.tag.nw{background:var(--ok-soft);border-color:transparent;color:var(--ok);font-weight:600}
+.del{background:none;border:0;color:var(--faint);font-size:.76rem;cursor:pointer;padding:0;margin-left:auto}
 .del.sure{color:var(--warn);font-weight:700}
-.item.fresh{animation:fl 2s ease-out}
-.more{margin-top:10px;width:100%}
-.login{max-width:400px;margin:24px auto 0;display:grid;gap:12px}
-.login h2{margin-bottom:0}
-.msg{font-size:.9rem;padding:10px 12px;border-radius:10px;background:var(--soft)}
+.rec.fresh{animation:hi 2.4s ease-out}
+@keyframes hi{0%{background:var(--soft)}100%{background:transparent}}
+.btn{border:0;border-radius:11px;background:linear-gradient(180deg,var(--bhagwa),var(--bhagwa-deep));color:var(--on-bhagwa);font:700 .95rem var(--body);padding:10px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn svg{width:17px;height:17px}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.5}
+.more{width:100%;justify-content:center;margin-top:10px}
+.empty{text-align:center;padding:26px 10px;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font:700 1rem var(--display);margin-bottom:4px}
+
+/* login */
+.auth{min-height:calc(100vh - 140px);display:grid;place-items:center;padding-block:10px}
+.auth .card{width:100%;max-width:400px;padding:0;overflow:hidden}
+.auth img{display:block;width:100%;aspect-ratio:2/1;object-fit:cover}
+.auth .in{padding:20px;display:grid;gap:12px}
+.auth h2{margin:0;font:800 1.2rem var(--display)}
+.auth p{margin:0;color:var(--muted);font-size:.86rem}
+label.f{display:grid;gap:5px;font-weight:600;font-size:.86rem}
+.msg{font-size:.88rem;padding:10px 12px;border-radius:10px;background:var(--soft)}
 .msg.err{color:var(--warn)} .msg.ok{color:var(--ok)}
-.link{background:none;border:0;color:var(--bhagwa-deep);font:600 .88rem var(--body);cursor:pointer;padding:0;text-decoration:underline;justify-self:start}
-label.f{display:grid;gap:5px;font-weight:600;font-size:.9rem}
+.auth .btn{justify-content:center;padding:12px}
+#loading{text-align:center;color:var(--muted);padding:60px 0}
 </style>
 </head>
 <body>
-<header><div class="wrap">
-  <div class="ttl"><p>ராஷ்ட்ரீய ஸ்வயம்சேவக சங்கம் · புதுக்கோட்டை ஜில்லா</p><h1>பதசஞ்சலன் 2026 · நிர்வாகம்</h1></div>
+<header class="bar"><div class="wrap">
+  <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3v18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M6 4c4 0 6 1.5 12 1.2L14.5 9 19 13c-6 .3-8-1.2-13-1.2" fill="#fff"/></svg></div>
+  <div class="brand"><b>பதசஞ்சலன் 2026</b><span>புதுக்கோட்டை ஜில்லா · நிர்வாகம்</span></div>
   <span class="live" id="live" hidden><i></i><span id="liveTxt">இணைக்கிறது…</span></span>
-  <button class="hbtn" id="logout" hidden>வெளியேறு</button>
+  <button class="icon-btn" id="logout" title="வெளியேறு" aria-label="வெளியேறு" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/></svg></button>
 </div></header>
 
 <main><div class="wrap">
 
-<section id="loginView" class="card login" hidden>
-  <h2>நிர்வாகி உள்நுழைவு</h2>
-  <label class="f">மின்னஞ்சல்<input id="email" type="email" autocomplete="username"></label>
-  <label class="f">கடவுச்சொல்<input id="pass" type="password" autocomplete="current-password"></label>
-  <div id="loginMsg" class="msg" hidden></div>
-  <button class="btn" id="loginBtn">உள்நுழை</button>
-  <button class="link" id="signupBtn" type="button">முதல் முறையா? இதே விவரத்தில் கணக்கு உருவாக்கு</button>
+<section id="loginView" class="auth" hidden>
+  <div class="card">
+    <img src="banner.webp" alt="">
+    <div class="in">
+      <h2>நிர்வாகி உள்நுழைவு</h2>
+      <p>ராஷ்ட்ரீய ஸ்வயம்சேவக சங்கம் · புதுக்கோட்டை ஜில்லா</p>
+      <label class="f">மின்னஞ்சல்<input id="email" type="email" autocomplete="username"></label>
+      <label class="f">கடவுச்சொல்<input id="pass" type="password" autocomplete="current-password"></label>
+      <div id="loginMsg" class="msg" hidden></div>
+      <button class="btn" id="loginBtn">உள்நுழை</button>
+    </div>
+  </div>
 </section>
 
-<section id="denied" class="card" hidden>
-  <h2>அனுமதி இல்லை</h2>
-  <p class="none" id="deniedTxt"></p>
+<section id="denied" class="auth" hidden>
+  <div class="card"><div class="in"><h2>அனுமதி இல்லை</h2><p id="deniedTxt"></p><button class="btn ghost" id="logout2">வேறு கணக்கில் உள்நுழை</button></div></div>
 </section>
 
-<div id="dash" hidden style="display:grid;gap:16px">
-  <div class="tiles">
-    <div class="tile hl"><b id="kTotal">0</b><span>மொத்த பதிவு</span></div>
-    <div class="tile"><b id="kToday">0</b><span>இன்று</span></div>
-    <div class="tile"><b id="kNew">0</b><span>புதியவர்கள்</span></div>
-    <div class="tile"><b id="kAge">–</b><span>சராசரி வயது</span></div>
+<div id="dash" hidden>
+  <section class="band">
+    <div style="position:relative;z-index:1">
+      <p class="kicker">மொத்த பதிவு</p>
+      <div class="big" id="kTotal">0</div>
+      <span class="delta" id="kToday">இன்று 0</span>
+      <div class="minis">
+        <div class="mini"><b id="kNew">0</b><span>புதியவர்கள்</span></div>
+        <div class="mini"><b id="kAge">–</b><span>சராசரி வயது</span></div>
+        <div class="mini"><b id="kUnits">0/8</b><span>கண்ட / நகர்</span></div>
+      </div>
+    </div>
+    <div class="trend"><h3>கடந்த 7 நாள் பதிவுகள்</h3><svg id="trend" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="கடந்த 7 நாள் பதிவுகள்"></svg></div>
+  </section>
+
+  <div>
+    <div class="sec-h"><h2>கண்ட / நகர் வாரியாக</h2><small>அட்டையைத் தொட்டால் கீழே பட்டியல் வடிகட்டும்</small></div>
+    <div class="units" id="units"></div>
   </div>
 
   <section class="card">
-    <h2>கண்ட / நகர் × வயது <small>எண்ணை தொட்டால் கீழே பட்டியல் வடிகட்டும்</small></h2>
-    <div class="tblwrap"><table id="matrix"></table></div>
+    <h3>வயது பிரிவு</h3>
+    <div class="ages"><div class="agebar" id="ageBar"></div><div class="legend" id="ageLegend"></div></div>
   </section>
 
   <div class="grid2">
-    <section class="card"><h2>அமைப்பு வாரியாக</h2><div class="bars" id="byOrg"></div></section>
-    <section class="card"><h2>சங்க முகாம் வாரியாக</h2><div class="bars" id="byCamp"></div></section>
+    <section class="card"><h3>அமைப்பு வாரியாக</h3><div class="bars" id="byOrg"></div></section>
+    <section class="card"><h3>சங்க முகாம் வாரியாக</h3><div class="bars" id="byCamp"></div></section>
   </div>
 
-  <section class="card xl">
-    <div><h2 style="margin:0 0 2px">Excel பதிவிறக்கம்</h2><p>எல்லா பதிவுகள் + கண்ட வாரியான சுருக்கம் + ஒவ்வொரு கண்டத்துக்கும் தனி sheet</p></div>
-    <button class="btn" id="xlsx">Excel (.xlsx) பதிவிறக்கு</button>
-  </section>
+  <details class="card">
+    <summary>கண்ட × வயது விரிவான அட்டவணை</summary>
+    <div class="tblwrap"><table id="matrix"></table></div>
+  </details>
 
   <section class="card">
-    <h2>பதிவானவர்கள் <small id="shownCount"></small></h2>
+    <div class="sec-h" style="margin:0 0 12px"><h2>பதிவானவர்கள்</h2><small id="shownCount"></small><span class="sp"></span>
+      <button class="btn" id="xlsx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Excel</button></div>
     <div class="tools">
-      <input id="q" placeholder="பெயர் / ஊர் / எண் தேடு">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="பெயர் / ஊர் / எண் தேடு"></div>
       <select id="fUnit"><option value="">எல்லா கண்ட / நகர்</option></select>
       <select id="fAge"><option value="">எல்லா வயதும்</option></select>
     </div>
+    <div class="filters" id="filters"></div>
     <div class="list" id="list"></div>
     <button class="btn ghost more" id="more" hidden>மேலும் காட்டு</button>
   </section>
 </div>
 
-<div id="loading" class="card none" style="text-align:center">ஏற்றுகிறது…</div>
+<div id="loading">ஏற்றுகிறது…</div>
 </div></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -167,11 +265,13 @@ label.f{display:grid;gap:5px;font-weight:600;font-size:.9rem}
 const SB_URL="https://efvcsxgzxkfcqjhgvniz.supabase.co", SB_KEY="sb_publishable_pER5Dv8ToteXfq-Vxt-l_A_I0GIvFDF";
 const UNITS=["புதுக்கோட்டை நகர்","புதுக்கோட்டை கண்ட","திருமயம்","பொன்னமராவதி","அன்னவாசல்","விராலிமலை","குளத்தூர்","கந்தர்வகோட்டை"];
 const AGES=[["18-க்கு கீழ்",0,17],["18–25",18,25],["26–35",26,35],["36–50",36,50],["51+",51,200]];
+const ACOL=["var(--a0)","var(--a1)","var(--a2)","var(--a3)","var(--a4)"];
 const CAMPS=["ப்ராரம்பிக்","ப்ராத்தமிக்","சங்க சிக்ஷா வர்க","கார்யகர்த்தா விகாஸ் வர்க 1","கார்யகர்த்தா விகாஸ் வர்க 2"];
+const NEW="புதியவர்";
 const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-let rows=[], channel=null, limitShown=50, freshIds=new Set();
-
+let rows=[],channel=null,limitShown=50,freshIds=new Set();
 const ageGroup=a=>AGES.findIndex(g=>a>=g[1]&&a<=g[2]);
 UNITS.forEach(u=>$("fUnit").add(new Option(u,u)));
 AGES.forEach((g,i)=>$("fAge").add(new Option(g[0],String(i))));
@@ -179,44 +279,37 @@ AGES.forEach((g,i)=>$("fAge").add(new Option(g[0],String(i))));
 function view(v){
   $("loading").hidden=true;
   $("loginView").hidden=v!=="login";$("denied").hidden=v!=="denied";$("dash").hidden=v!=="dash";
-  $("logout").hidden=v==="login";$("live").hidden=v!=="dash";
+  $("logout").hidden=v!=="dash";$("live").hidden=v!=="dash";
 }
 function lmsg(t,k){const m=$("loginMsg");m.textContent=t;m.className="msg "+k;m.hidden=false}
-
-$("loginBtn").onclick=async()=>{
+async function doLogin(){
   const email=$("email").value.trim(),password=$("pass").value;
   if(!email||!password)return lmsg("மின்னஞ்சல், கடவுச்சொல் இரண்டும் தேவை.","err");
   $("loginBtn").disabled=true;
   const {error}=await sb.auth.signInWithPassword({email,password});
   $("loginBtn").disabled=false;
-  if(error)lmsg(/confirm/i.test(error.message)?"மின்னஞ்சலில் வந்த உறுதிப்படுத்தும் link-ஐ முதலில் அழுத்தவும்.":"மின்னஞ்சல் அல்லது கடவுச்சொல் தவறு.","err");
-};
-$("signupBtn").onclick=async()=>{
-  const email=$("email").value.trim(),password=$("pass").value;
-  if(!email||password.length<6)return lmsg("மின்னஞ்சலும் குறைந்தது 6 எழுத்து கடவுச்சொல்லும் கொடுக்கவும்.","err");
-  const {data,error}=await sb.auth.signUp({email,password});
-  if(error)return lmsg("கணக்கு உருவாக்க முடியவில்லை: "+error.message,"err");
-  if(!data.session)lmsg("உங்கள் மின்னஞ்சலுக்கு உறுதிப்படுத்தும் link அனுப்பப்பட்டது. அதை அழுத்திய பின் இங்கே உள்நுழையவும்.","ok");
-};
-$("logout").onclick=async()=>{await sb.auth.signOut()};
+  if(error)lmsg(/confirm/i.test(error.message)?"இந்த கணக்கு இன்னும் உறுதிப்படுத்தப்படவில்லை.":"மின்னஞ்சல் அல்லது கடவுச்சொல் தவறு.","err");
+}
+$("loginBtn").onclick=doLogin;
+$("pass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+$("logout").onclick=$("logout2").onclick=async()=>{await sb.auth.signOut()};
 
-sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>boot(session),0)});
 let booted=null;
+sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>boot(session),0)});
 async function boot(session){
   const key=session?session.user.id:"none";
   if(booted===key)return;booted=key;
   if(channel){sb.removeChannel(channel);channel=null}
   if(!session){rows=[];return view("login")}
   const {data:isAdmin}=await sb.rpc("ps_is_admin");
-  if(!isAdmin){$("deniedTxt").textContent=`${session.user.email} — இந்த கணக்குக்கு நிர்வாக அனுமதி இல்லை. முதன்மை நிர்வாகியிடம் கேட்கவும்.`;return view("denied")}
+  if(!isAdmin){$("deniedTxt").textContent=`${session.user.email} — இந்த கணக்குக்கு நிர்வாக அனுமதி இல்லை.`;return view("denied")}
   view("dash");await loadAll();subscribe();
 }
-
 async function loadAll(){
   const all=[];let from=0;
   while(true){
     const {data,error}=await sb.from("ps_regs").select("*").order("created_at",{ascending:false}).range(from,from+999);
-    if(error){$("list").innerHTML=`<div class="none">பதிவுகளை ஏற்ற முடியவில்லை: ${esc(error.message)}</div>`;return}
+    if(error){$("list").innerHTML=`<div class="empty"><b>பதிவுகளை ஏற்ற முடியவில்லை</b>${esc(error.message)}</div>`;return}
     all.push(...data);if(data.length<1000)break;from+=1000;
   }
   rows=all;render();
@@ -227,9 +320,7 @@ function subscribe(){
     .on("postgres_changes",{event:"INSERT",schema:"public",table:"ps_regs"},p=>{
       if(!rows.some(r=>r.id===p.new.id)){rows.unshift(p.new);freshIds.add(p.new.id);render(true)}
     })
-    .on("postgres_changes",{event:"DELETE",schema:"public",table:"ps_regs"},p=>{
-      rows=rows.filter(r=>r.id!==p.old.id);render();
-    })
+    .on("postgres_changes",{event:"DELETE",schema:"public",table:"ps_regs"},p=>{rows=rows.filter(r=>r.id!==p.old.id);render()})
     .subscribe(s=>{
       if(s==="SUBSCRIBED")setLive(true,"நேரலை");
       else if(s==="CHANNEL_ERROR"||s==="TIMED_OUT"||s==="CLOSED")setLive(false,"இணைப்பு இல்லை");
@@ -238,70 +329,108 @@ function subscribe(){
 function setLive(on,t){$("live").classList.toggle("on",on);$("liveTxt").textContent=t}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("dash").hidden)loadAll()});
 
-const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const isToday=d=>new Date(d).toDateString()===new Date().toDateString();
-const fmtT=d=>new Date(d).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+const dayKey=d=>{const x=new Date(d);return x.getFullYear()+"-"+x.getMonth()+"-"+x.getDate()};
+const fmtT=d=>{const x=new Date(d),t=x.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});return dayKey(x)===dayKey(new Date())?t:x.toLocaleDateString("en-IN",{day:"numeric",month:"short"})+" · "+t};
 
 function counts(){
   const m={};UNITS.forEach(u=>m[u]=AGES.map(()=>0));
-  const org={},camp={};let newc=0,ageSum=0,today=0;
+  const org={},camp={},newBy={},ageTot=AGES.map(()=>0);let newc=0,ageSum=0,today=0;const tk=dayKey(new Date());
   rows.forEach(r=>{
     if(!m[r.unit])m[r.unit]=AGES.map(()=>0);
-    const g=ageGroup(r.age);if(g>=0)m[r.unit][g]++;
-    ageSum+=r.age;if(r.is_new)newc++;if(isToday(r.created_at))today++;
-    const o=r.is_new?"புதியவர்":(r.org||"குறிப்பிடவில்லை");org[o]=(org[o]||0)+1;
+    const g=ageGroup(r.age);if(g>=0){m[r.unit][g]++;ageTot[g]++}
+    ageSum+=r.age;if(dayKey(r.created_at)===tk)today++;
+    if(r.is_new){newc++;newBy[r.unit]=(newBy[r.unit]||0)+1}
+    const o=r.is_new?NEW:(r.org||"குறிப்பிடவில்லை");org[o]=(org[o]||0)+1;
     if(!r.is_new){const c=r.camp||"முகாம் இல்லை";camp[c]=(camp[c]||0)+1}
   });
-  return {m,org,camp,newc,today,avg:rows.length?(ageSum/rows.length).toFixed(1):"–"};
+  return {m,org,camp,newBy,ageTot,newc,today,avg:rows.length?(ageSum/rows.length).toFixed(1):"–"};
 }
-function setNum(id,v,flash){const el=$(id);if(el.textContent!==String(v)){el.textContent=v;if(flash){el.parentElement.classList.remove("flash");void el.offsetWidth;el.parentElement.classList.add("flash")}}}
+function setNum(id,v,flash){const el=$(id);if(el.textContent!==String(v)){el.textContent=v;if(flash){el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}}}
+
+function trend(){
+  const days=[],now=new Date();
+  for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);days.push({k:dayKey(d),l:d.toLocaleDateString("en-IN",{day:"numeric",month:"short"}),n:0})}
+  const idx=Object.fromEntries(days.map((d,i)=>[d.k,i]));
+  rows.forEach(r=>{const i=idx[dayKey(r.created_at)];if(i!==undefined)days[i].n++});
+  const max=Math.max(1,...days.map(d=>d.n)),W=320,H=150,top=18,bot=22,bw=W/7;
+  $("trend").innerHTML=days.map((d,i)=>{
+    const h=(H-top-bot)*d.n/max,x=i*bw+bw*.2,w=bw*.6,y=H-bot-h;
+    return `<rect x="${x}" y="${H-bot-(H-top-bot)}" width="${w}" height="${H-top-bot}" rx="5" fill="rgba(255,255,255,.1)"/>`+
+      `<rect x="${x}" y="${y}" width="${w}" height="${Math.max(h,d.n?3:0)}" rx="5" fill="${i===6?"#fff":"rgba(255,255,255,.62)"}"/>`+
+      (d.n?`<text x="${x+w/2}" y="${y-5}" text-anchor="middle" style="font-weight:700;fill:#fff">${d.n}</text>`:"")+
+      `<text x="${x+w/2}" y="${H-6}" text-anchor="middle">${i===6?"இன்று":d.l}</text>`;
+  }).join("");
+}
+function unitsView(c){
+  const tot=rows.length||1,sel=$("fUnit").value;
+  $("units").innerHTML=Object.keys(c.m).map(u=>{
+    const a=c.m[u],n=a.reduce((x,y)=>x+y,0),nw=c.newBy[u]||0;
+    return `<button class="unit${sel===u?" sel":""}" data-u="${esc(u)}">
+      <div><div class="tp">${u==="புதுக்கோட்டை நகர்"?"நகர்":"கண்ட"}</div><div class="nm">${esc(u)}</div></div>
+      <div class="row"><span class="ct">${n}</span><span class="pc">${rows.length?Math.round(n/tot*100):0}%</span></div>
+      <div class="stack">${n?a.map((v,i)=>v?`<i style="flex:${v};background:${ACOL[i]};color:${i<2?"var(--ink)":"#fff"}"></i>`:"").join(""):""}</div>
+      <div class="nw${nw?"":" z"}">${nw?`${nw} புதியவர்`:"புதியவர் இல்லை"}</div></button>`;
+  }).join("");
+}
+$("units").addEventListener("click",e=>{
+  const b=e.target.closest(".unit");if(!b)return;
+  $("fUnit").value=$("fUnit").value===b.dataset.u?"":b.dataset.u;limitShown=50;render();
+  if($("fUnit").value)$("list").scrollIntoView({behavior:"smooth",block:"center"});
+});
+function agesView(c){
+  const tot=rows.length;
+  $("ageBar").innerHTML=tot?c.ageTot.map((v,i)=>v?`<i style="flex:${v};background:${ACOL[i]};color:${i<2?"var(--ink)":"#fff"}">${v/tot>=.08?Math.round(v/tot*100)+"%":""}</i>`:"").join(""):"";
+  $("ageLegend").innerHTML=AGES.map((g,i)=>`<div class="lg" style="--c:${ACOL[i]}"><span>${g[0]}</span><b>${c.ageTot[i]}</b></div>`).join("");
+}
 function bars(el,map,order){
   let ent=Object.entries(map);
   if(order)ent.sort((a,b)=>{const ia=order.indexOf(a[0]),ib=order.indexOf(b[0]);return (ia<0?99:ia)-(ib<0?99:ib)});
   else ent.sort((a,b)=>b[1]-a[1]);
   if(!ent.length){el.innerHTML='<div class="none">இன்னும் பதிவு இல்லை</div>';return}
   const max=Math.max(...ent.map(e=>e[1]));
-  el.innerHTML=ent.map(([k,n])=>`<div class="bar${k==="புதியவர்"?" new":""}"><span class="l" title="${esc(k)}">${esc(k)}</span><span class="t"><i style="width:${(n/max*100).toFixed(1)}%"></i></span><span class="n">${n}</span></div>`).join("");
+  el.innerHTML=ent.map(([k,n])=>`<div class="hb${k===NEW?" new":""}"><span class="l" title="${esc(k)}">${esc(k)}</span><span class="n">${n}</span><span class="t"><i style="width:${(n/max*100).toFixed(1)}%"></i></span></div>`).join("");
 }
 function matrix(m){
   let max=1;Object.values(m).forEach(a=>a.forEach(n=>max=Math.max(max,n)));
-  const colT=AGES.map(()=>0);let html=`<thead><tr><th>கண்ட / நகர்</th>${AGES.map(g=>`<th>${g[0]}</th>`).join("")}<th>மொத்தம்</th></tr></thead><tbody>`;
+  const colT=AGES.map(()=>0);
+  let h=`<thead><tr><th>கண்ட / நகர்</th>${AGES.map(g=>`<th>${g[0]}</th>`).join("")}<th>மொத்தம்</th></tr></thead><tbody>`;
   Object.keys(m).forEach(u=>{
     const a=m[u],t=a.reduce((x,y)=>x+y,0);a.forEach((n,i)=>colT[i]+=n);
-    html+=`<tr><td>${esc(u)}</td>${a.map((n,i)=>`<td class="c" data-u="${esc(u)}" data-a="${i}" style="${n?`background:rgba(var(--heat),${(.12+.55*n/max).toFixed(2)});cursor:pointer`:"color:var(--muted)"}">${n||"·"}</td>`).join("")}<td class="n">${t}</td></tr>`;
+    h+=`<tr><td>${esc(u)}</td>${a.map(n=>`<td class="c" style="${n?`background:color-mix(in srgb,var(--bhagwa) ${Math.round(10+55*n/max)}%,transparent)`:"color:var(--faint)"}">${n||"·"}</td>`).join("")}<td class="n">${t}</td></tr>`;
   });
-  html+=`<tr class="tot"><td>மொத்தம்</td>${colT.map(n=>`<td>${n}</td>`).join("")}<td>${rows.length}</td></tr></tbody>`;
-  $("matrix").innerHTML=html;
+  h+=`<tr class="tot"><td>மொத்தம்</td>${colT.map(n=>`<td>${n}</td>`).join("")}<td>${rows.length}</td></tr></tbody>`;
+  $("matrix").innerHTML=h;
 }
-$("matrix").addEventListener("click",e=>{
-  const td=e.target.closest("td.c");if(!td||td.textContent==="·")return;
-  $("fUnit").value=td.dataset.u;$("fAge").value=td.dataset.a;limitShown=50;renderList();
-  $("list").scrollIntoView({behavior:"smooth",block:"start"});
-});
-
 function render(flash){
   const c=counts();
-  setNum("kTotal",rows.length,flash);setNum("kToday",c.today,flash);setNum("kNew",c.newc,flash);setNum("kAge",c.avg);
-  matrix(c.m);bars($("byOrg"),c.org);bars($("byCamp"),c.camp,[...CAMPS,"முகாம் இல்லை"]);
-  renderList();
+  setNum("kTotal",rows.length,flash);setNum("kNew",c.newc,flash);setNum("kAge",c.avg);
+  $("kToday").textContent=`இன்று ${c.today}`;
+  $("kUnits").textContent=`${Object.values(c.m).filter(a=>a.some(Boolean)).length}/8`;
+  trend();unitsView(c);agesView(c);
+  bars($("byOrg"),c.org);bars($("byCamp"),c.camp,[...CAMPS,"முகாம் இல்லை"]);
+  matrix(c.m);renderList();
 }
 function filtered(){
   const q=$("q").value.trim().toLowerCase(),fu=$("fUnit").value,fa=$("fAge").value;
   return rows.filter(r=>(!fu||r.unit===fu)&&(fa===""||ageGroup(r.age)===+fa)&&(!q||[r.name,r.ooru,r.phone].join(" ").toLowerCase().includes(q)));
 }
 function renderList(){
-  const f=filtered(),shown=f.slice(0,limitShown);
+  const f=filtered(),shown=f.slice(0,limitShown),fu=$("fUnit").value,fa=$("fAge").value;
   $("shownCount").textContent=`${f.length} பேர்`;
   $("more").hidden=f.length<=limitShown;
-  if(!f.length){$("list").innerHTML=`<div class="none" style="padding:16px 0;text-align:center">${rows.length?"பொருந்தும் பதிவு இல்லை":"இன்னும் யாரும் பதிவு செய்யவில்லை. படிவத்தில் பதிவுகள் வந்ததும் இங்கே உடனே தெரியும்."}</div>`;return}
-  $("list").innerHTML=shown.map(r=>`<div class="item${freshIds.has(r.id)?" fresh":""}">
-    <span class="nm">${esc(r.name)}, ${r.age}</span><span class="tm">${fmtT(r.created_at)}</span>
-    <div class="meta">${esc(r.ooru)} · ${esc(r.unit)} · ${esc(r.phone)}${r.edu_job?" · "+esc(r.edu_job):""}<br>
-      ${r.is_new?'<span class="tag new">புதியவர்</span>':""}${r.org?`<span class="tag">${esc(r.org)}</span>`:""}${r.camp?`<span class="tag">${esc(r.camp)}</span>`:""}
+  $("filters").innerHTML=(fu?`<button class="fchip" data-clr="fUnit">${esc(fu)} ✕</button>`:"")+(fa!==""?`<button class="fchip" data-clr="fAge">${AGES[+fa][0]} ✕</button>`:"");
+  if(!f.length){$("list").innerHTML=rows.length?`<div class="empty"><b>பொருந்தும் பதிவு இல்லை</b>தேடல் அல்லது வடிகட்டலை மாற்றிப் பாருங்கள்.</div>`:`<div class="empty"><b>இன்னும் பதிவு இல்லை</b>படிவத்தில் பதிவுகள் வந்ததும் இங்கே உடனே தெரியும்.</div>`;return}
+  $("list").innerHTML=shown.map(r=>`<div class="rec${freshIds.has(r.id)?" fresh":""}">
+    <span class="av${r.is_new?" nw":""}">${esc((r.name||"?").trim().charAt(0))}</span>
+    <span class="nm">${esc(r.name)} <small>· ${r.age}</small></span><span class="tm">${fmtT(r.created_at)}</span>
+    <div class="meta"><span>${esc(r.ooru)}</span><a href="tel:${esc(r.phone)}">${esc(r.phone)}</a>${r.edu_job?`<span>${esc(r.edu_job)}</span>`:""}
+      <span class="tag u">${esc(r.unit)}</span>${r.is_new?'<span class="tag nw">புதியவர்</span>':""}${r.org&&!r.is_new?`<span class="tag">${esc(r.org)}</span>`:""}${r.camp?`<span class="tag">${esc(r.camp)}</span>`:""}
       <button class="del" data-id="${r.id}">நீக்கு</button></div></div>`).join("");
   freshIds.clear();
 }
-["q","fUnit","fAge"].forEach(id=>$(id).addEventListener(id==="q"?"input":"change",()=>{limitShown=50;renderList()}));
+$("filters").addEventListener("click",e=>{const b=e.target.closest("[data-clr]");if(b){$(b.dataset.clr).value="";limitShown=50;render()}});
+$("q").addEventListener("input",()=>{limitShown=50;renderList()});
+["fUnit","fAge"].forEach(id=>$(id).addEventListener("change",()=>{limitShown=50;render()}));
 $("more").onclick=()=>{limitShown+=100;renderList()};
 $("list").addEventListener("click",async e=>{
   const b=e.target.closest(".del");if(!b)return;
@@ -311,17 +440,17 @@ $("list").addEventListener("click",async e=>{
 });
 
 $("xlsx").onclick=()=>{
-  if(!window.XLSX){alertMsg();return}
+  if(!window.XLSX){$("xlsx").lastChild.textContent="Excel கருவி ஏற்றப்படவில்லை";return}
   const sorted=[...rows].sort((a,b)=>UNITS.indexOf(a.unit)-UNITS.indexOf(b.unit)||new Date(a.created_at)-new Date(b.created_at));
-  const toRow=(r,i)=>({"வ.எண்":i+1,"பெயர்":r.name,"வயது":r.age,"வயது பிரிவு":AGES[ageGroup(r.age)]?.[0]||"","படிப்பு / தொழில்":r.edu_job||"","ஊர்":r.ooru,"கைபேசி":r.phone,"கண்ட / நகர்":r.unit,"சங்க முகாம்":r.camp||"","அமைப்பு":r.is_new?"புதியவர்":(r.org||""),"பதிவு நேரம்":new Date(r.created_at).toLocaleString("en-IN")});
+  const toRow=(r,i)=>({"வ.எண்":i+1,"பெயர்":r.name,"வயது":r.age,"வயது பிரிவு":AGES[ageGroup(r.age)]?.[0]||"","படிப்பு / தொழில்":r.edu_job||"","ஊர்":r.ooru,"கைபேசி":r.phone,"கண்ட / நகர்":r.unit,"சங்க முகாம்":r.camp||"","அமைப்பு":r.is_new?NEW:(r.org||""),"பதிவு நேரம்":new Date(r.created_at).toLocaleString("en-IN")});
   const wb=XLSX.utils.book_new();
   const cols=[{wch:6},{wch:24},{wch:6},{wch:11},{wch:22},{wch:18},{wch:12},{wch:20},{wch:24},{wch:22},{wch:20}];
   const all=XLSX.utils.json_to_sheet(sorted.map(toRow));all["!cols"]=cols;
   XLSX.utils.book_append_sheet(wb,all,"எல்லா பதிவுகள்");
   const c=counts();
   const sum=[["கண்ட / நகர்",...AGES.map(g=>g[0]),"மொத்தம்","புதியவர்கள்"]];
-  Object.keys(c.m).forEach(u=>{const a=c.m[u];sum.push([u,...a,a.reduce((x,y)=>x+y,0),rows.filter(r=>r.unit===u&&r.is_new).length])});
-  sum.push(["மொத்தம்",...AGES.map((g,i)=>Object.values(c.m).reduce((s,a)=>s+a[i],0)),rows.length,c.newc]);
+  Object.keys(c.m).forEach(u=>{const a=c.m[u];sum.push([u,...a,a.reduce((x,y)=>x+y,0),c.newBy[u]||0])});
+  sum.push(["மொத்தம்",...c.ageTot,rows.length,c.newc]);
   const ws=XLSX.utils.aoa_to_sheet(sum);ws["!cols"]=[{wch:20},...AGES.map(()=>({wch:11})),{wch:9},{wch:11}];
   XLSX.utils.book_append_sheet(wb,ws,"கண்ட சுருக்கம்");
   UNITS.forEach(u=>{const rs=sorted.filter(r=>r.unit===u);if(!rs.length)return;
@@ -329,7 +458,6 @@ $("xlsx").onclick=()=>{
   const d=new Date(),stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   XLSX.writeFile(wb,`pathsanchalan-pudukkottai-${stamp}.xlsx`);
 };
-function alertMsg(){$("xlsx").textContent="Excel கருவி ஏற்றப்படவில்லை — இணையத்தை சரிபார்க்கவும்"}
 
 (async()=>{const {data}=await sb.auth.getSession();boot(data.session)})();
 </script>
